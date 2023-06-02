@@ -108,8 +108,8 @@ function Chatbox({ userName, operatorName }) {
                     <img src="https://img.icons8.com/color/48/000000/circled-user-female-skin-type-5--v1.png" alt="" />
                     <span className="chatbox__title" style={{ color: "white", font: "4px" }}>
                         <b>
-                          I am a clever AI assistant.<br /><br />
-                          How can I help ?
+                          Hi, My name is Aurora<br /><br />
+                          Ask me anything
                         </b>
                     </span>
                     <button className="chatbox__close" onClick={toggleChatbox}>
@@ -145,7 +145,7 @@ function Chatbox({ userName, operatorName }) {
                             <IoMdSend size={30} color="#FFF" />
                         </button>
                     </div>
-                    <div className="chatbox__powered">Powered By Aurora</div>
+                    <div className="chatbox__powered">Powered By EaziBots <img src='https://img.icons8.com/?size=512&id=63766&format=png' style={{ verticalAlign: 'middle', height: '30px', width: '30px', marginRight: '5px' }} alt='globe'></img></div>
                 </div>
             </div>
             <div className="chatbox__toggle">
