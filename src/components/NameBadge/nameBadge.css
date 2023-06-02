@@ -1,0 +1,19 @@
+.badge {
+    display: flex;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    padding: 5px;
+
+}
+
+.badge--operator {
+    background: #e0e0e0;
+}
+
+.badge--visitor {
+    background: var(--primary);
+    color: #fff;
+}
