@@ -34,7 +34,7 @@
     height: 80px;
     border: none;
     border-radius: 50%;
-    background: #581b98;
+    background: linear-gradient(93.12deg, #98891b 0.52%, #9c1de7 100%);
     cursor: pointer;
 }
 

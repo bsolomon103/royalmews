@@ -1,11 +1,12 @@
 import Linkify from "react-linkify";
 import NameBadge from "../NameBadge";
 import "./chatboxMessage.css";
-import React, {useState} from "react";
 
 
 
-export default function ChatboxMessage({ msg }) {
+
+
+export default function ChatboxMessage({ msg, sessionKey }) {
     const isOperator = msg.role === "operator";
 
     return (
@@ -13,7 +14,7 @@ export default function ChatboxMessage({ msg }) {
             <NameBadge name={msg.name} isOperator={isOperator} />
             <div className={`messages__item ${isOperator ? "messages__item--operator" : "messages__item--visitor"}`}>
                 {isOperator ? (
-                    <div dangerouslySetInnerHTML={{ __html: msg.message }} />
+                    <div dangerouslySetInnerHTML={{ __html: msg.message }}/>
                 ) : (
                     <Linkify
                         componentDecorator={(decoratedHref, decoratedText, key) => (
@@ -24,6 +25,7 @@ export default function ChatboxMessage({ msg }) {
                     >
                         {msg.message}
                     </Linkify>
+                    
                 )}
             </div>
         </div>
