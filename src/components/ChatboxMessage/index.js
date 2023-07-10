@@ -18,7 +18,7 @@ export default function ChatboxMessage({ msg, sessionKey }) {
                 ) : (
                     <Linkify
                         componentDecorator={(decoratedHref, decoratedText, key) => (
-                            <a target="blank" style={{ color: "#FFF" }} href={decoratedHref} key={key}>
+                            <a target="blank" style={{ color: "#003366" }} href={decoratedHref} key={key}>
                                 {decoratedText}
                             </a>
                         )}

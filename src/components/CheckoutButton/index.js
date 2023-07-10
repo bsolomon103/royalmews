@@ -50,7 +50,7 @@ function CheckoutButton(sessionKey) {
   return (
     
     <form className='checkout' action="/create-checkout-session" method="POST" onSubmit={handleSubmit}>
-        <button type="submit">Checkout</button>
+        <button type="submit"><img src ='https://img.icons8.com/?size=512&id=43146&format=png' alt='' style={{ verticalAlign: 'middle', height: '20px', width: '20px', marginRight: '5px' }}></img>Checkout</button>
     </form>
   );
 }

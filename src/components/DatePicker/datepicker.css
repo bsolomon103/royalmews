@@ -1,0 +1,11 @@
+.datepicker{
+    margin-left: 1cm;
+    margin-top: 1px;
+
+}
+
+.datepicker__input{
+    border-radius: 5px;
+    text-align: center;
+    border: 2px solid #003366;
+}

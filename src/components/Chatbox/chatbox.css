@@ -34,7 +34,7 @@
     height: 80px;
     border: none;
     border-radius: 50%;
-    background: linear-gradient(93.12deg, #98891b 0.52%, #9c1de7 100%);
+    background: linear-gradient(93.12deg, #fff 0.62%, #6ea4f5 100%);
     cursor: pointer;
 }
 
@@ -61,7 +61,13 @@
 .chatbox__title {
     flex: 1;
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 1.1rem;
+    font-family: Monospace;
+    font-style: italic;
+    font-weight: bold;
+    line-height: 1.0;
+    
+    
 }
 
 .chatbox__close {
