@@ -1,84 +1,91 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
 //import Calendar from 'react-calendar'
-import 'react-datepicker/dist/react-datepicker.css';
-import { parseISO, isSameDay } from 'date-fns';
-import './datepicker.css';
+import "react-datepicker/dist/react-datepicker.css";
+import { setHours } from "date-fns";
+import "./datepicker.css";
 
+function MyDatePicker({ availableDates, setDateInput }) {
+  const [fullDate, setFullDate] = useState(null);
+  // e.g 2023-07-01
+  const [justDate, setJustDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState(null);
 
-function MyDatePicker({ availableDates }) {
-  console.log(availableDates[0])
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState('');
+  const handleDateChange = (value) => {
+    let day = value.toLocaleDateString("en-GB").split("T")[0];
+    day = day.split("/").reverse().join("-");
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    setSelectedTime('');
+    setFullDate(value);
+    setJustDate(day);
+    setSelectedTime(null);
   };
 
-  const handleTimeChange = (event) => {
-    setSelectedTime(event.target.value);
+  const handleTimeChange = (value) => {
+    let hour = value.getHours();
+    // Modify the time on `fullDate`'s  value. It is 12:00am by default
+    const selectedTimeAndDay = setHours(new Date(fullDate), hour);
+
+    setSelectedTime(selectedTimeAndDay);
+    setDateInput(selectedTimeAndDay);
   };
 
-  const filterDate = (date) => {
-    const dateString = date.toISOString().slice(0, 10);
-    //console.log(availableDates[0])
-    const matchedDates = availableDates.some((availableDate) => availableDate.startsWith(dateString));
-    return matchedDates
+  const datesToInclude = () => {
+    const dates = availableDates.map((date) => {
+      const dateString = date.split("T")[0]; //remove
+      return new Date(dateString);
+    });
+
+    return dates;
   };
 
-  const filterTime = (time) => {
-    if (!selectedDate) {
-      return false; // Show all times if no date is selected
-    }
+  const availableTimes = () => {
+    let groupTimesByDate = availableDates.reduce((acc, dateTime) => {
+      let day = dateTime.split("T")[0]; //remove
 
-    const selectedDateString = selectedDate.toISOString().slice(0, 10);
-    //console.log(selectedDateString)
-    const availableTimesForDate = availableDates
-      .filter((date) => {
-        date.startsWith(selectedDateString)
-        //console.log(date)
+      if (acc.hasOwnProperty(day)) {
+        acc[day].push(new Date(dateTime)); //remove
+      } else {
+        acc[day] = [new Date(dateTime)]; //remove
       }
-        )
-      
-      .map((date) => date.slice(11, 16));
-    //console.log(availableTimesForDate)
-    return !availableTimesForDate.includes(time);
+
+      return acc;
+    }, {});
+
+    return groupTimesByDate;
   };
+
+  const timesToInclude = availableTimes();
 
   return (
-    <div className='datepicker'>
+    <div className="datepicker">
       <DatePicker
-        selected={selectedDate}
+        selected={fullDate}
         onChange={handleDateChange}
-        placeholderText='Pick a date'
-        popperPlacement='top-start'
+        placeholderText="Pick a date"
+        popperPlacement="top-start"
         dateFormat="yyyy-MM-dd"
-        showTimeSelect
-        timeIntervals={15}
-        timeCaption="Time"
-        filterDate={filterDate}
-        filterTime={filterTime}
+        includeDates={datesToInclude()}
       />
-      {selectedDate && (
-        <select value={selectedTime} onChange={handleTimeChange}>
-          <option value=''>Pick a time</option>
-          {availableDates
-            .filter((date) => date.startsWith(selectedDate.toISOString().slice(0, 10)))
-            .map((date) => (
-              <option key={date} value={date.slice(11, 16)}>
-                {date.slice(11, 16)}
-              </option>
-            ))}
-        </select>
-      )}
+
+      {fullDate ? (
+        <DatePicker
+          selected={selectedTime}
+          onChange={handleTimeChange}
+          placeholderText="Pick a time"
+          popperPlacement="top-start"
+          showTimeSelect
+          timeIntervals={60}
+          timeCaption="Time"
+          showTimeSelectOnly
+          dateFormat="h:mm aa"
+          includeTimes={timesToInclude[justDate]}
+        />
+      ) : null}
     </div>
   );
 }
 
 export default MyDatePicker;
-
-
 
 /*
 //const URL = "https://api.eazibots.com/api/response/"

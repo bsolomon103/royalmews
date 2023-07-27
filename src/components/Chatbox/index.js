@@ -4,9 +4,9 @@ import { BsChatRightTextFill } from "react-icons/bs";
 import { RiCloseFill } from "react-icons/ri";
 import { IoMdSend } from "react-icons/io";
 import ChatboxMessage from "../ChatboxMessage";
-import CheckoutButton from '../CheckoutButton';
-import  MyDatePicker  from "../DatePicker";
-
+import CheckoutButton from "../CheckoutButton";
+import MyDatePicker from "../DatePicker";
+import { format } from "date-fns";
 
 //import ImageUploadForm from '../ImageUpload';
 //import Button from '@material-ui/core/Button';
@@ -15,15 +15,18 @@ import  MyDatePicker  from "../DatePicker";
 
 //const URL = "http://localhost:8000/api/response/";
 // const URL = "http://127.0.0.1:8000/api/response/";
-const URL = "https://api.eazibots.com/api/response/"
+const URL = "https://api.eazibots.com/api/response/";
 
 function Chatbox({ userName, operatorName }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const [dateInput, setDateInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessionKey, setSessionKey] = useState("");
-  const [placeholder, setPlaceholder] = useState("Hi I'm Aurora, an AI powered assistant.");
+  const [placeholder, setPlaceholder] = useState(
+    "Hi I'm Aurora, an AI powered assistant."
+  );
   const [userInteracted, setUserInteracted] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
 
@@ -55,15 +58,29 @@ function Chatbox({ userName, operatorName }) {
     }
   };
 
+  const formatDate = (datetime, formatType) => {
+    const types = {
+      forBackend: "yyyy-MM-dd'T'HH:mm:ssxxx",
+      humanReadable: "p',' PPPP",
+    };
+
+    return format(new Date(datetime), types[formatType]);
+  };
+
   const handleSend = async () => {
-    if (text.trim() === "") {
+    if (text.trim() === "" && !dateInput) {
       return;
     }
 
+    let newMessage = dateInput ? formatDate(dateInput, "humanReadable") : text;
+    let valueToSend = dateInput ? formatDate(dateInput, "forBackend") : text;
+
     setLoading(true);
-    const msg1 = { role: "user", name: userName, message: text };
+    const msg1 = { role: "user", name: userName, message: newMessage };
     setMessages((messages) => [...messages, msg1]);
+    setDateInput("");
     setText("");
+    setAvailableDates([]);
 
     const csrftoken = getCookie("csrftoken");
     const sessiontoken = getCookie("sessionid");
@@ -78,86 +95,89 @@ function Chatbox({ userName, operatorName }) {
           "X-CSRFToken": csrftoken,
           "X-Session-ID": sessiontoken,
         },
-        body: JSON.stringify({ msg: text, session_key:sessionKey }),
+        body: JSON.stringify({ msg: valueToSend, session_key: sessionKey }),
         credentials: "include",
       });
       const result = await response.json();
       //console.log(result)
 
       setLoading(false);
-      const msg2 = { role: "operator", name: operatorName, message: result['response'] };
-      setSessionKey(result['session_key'])
-      
-      if (Array.isArray(result['response'])) {
-      const startDates = result['response'].map(dateObj => dateObj.start);
-      setAvailableDates(startDates); // Update availableDates state with the array of start dates
-      //console.log(startDates);
-    }
 
-      
+      const msg2 = {
+        role: "operator",
+        name: operatorName,
+        message: result["response"],
+      };
+      setSessionKey(result["session_key"]);
+
+      if (Array.isArray(result["response"])) {
+        const startDates = result["response"].map((dateObj) => dateObj.start);
+        setAvailableDates(startDates); // Update availableDates state with the array of start dates
+        //console.log(startDates);
+      }
+
       //setTimeout(2000)
       setMessages((messages) => [...messages, msg2]);
     } catch (err) {
       setLoading(false);
       console.error("Error:", err);
     }
-    
   };
-  
 
-  
-    useEffect(() => {
+  useEffect(() => {
     if (!userInteracted) {
-    let typingTimer;
-    const placeholderText = "Hi I'm Aurora, an AI powered assistant.";
-    const typingDelay = 100; // Delay between each character
-    const erasingDelay = 50; // Delay between each character while erasing
-    const pauseDelay = 20000; // Delay before starting erasing
+      let typingTimer;
+      const placeholderText = "Hi I'm Aurora, an AI powered assistant.";
+      const typingDelay = 100; // Delay between each character
+      const erasingDelay = 50; // Delay between each character while erasing
+      const pauseDelay = 20000; // Delay before starting erasing
 
-    const typeText = () => {
-      let currentIndex = 0;
-      setPlaceholder('H');
+      const typeText = () => {
+        let currentIndex = 0;
+        setPlaceholder("H");
 
-      typingTimer = setInterval(() => {
-        setPlaceholder((prevPlaceholder) => prevPlaceholder + placeholderText[currentIndex]);
-        currentIndex++;
-  
+        typingTimer = setInterval(() => {
+          setPlaceholder(
+            (prevPlaceholder) => prevPlaceholder + placeholderText[currentIndex]
+          );
+          currentIndex++;
 
-        if (currentIndex === placeholderText.length-1) {
-          clearInterval(typingTimer);
-          setTimeout(eraseText, pauseDelay);
-        
-        }
-      }, typingDelay);
-    };
+          if (currentIndex === placeholderText.length - 1) {
+            clearInterval(typingTimer);
+            setTimeout(eraseText, pauseDelay);
+          }
+        }, typingDelay);
+      };
 
-   
-    const eraseText = () => {
-      let currentIndex = placeholderText.length-1;
+      const eraseText = () => {
+        let currentIndex = placeholderText.length - 1;
 
-      typingTimer = setInterval(() => {
-        setPlaceholder((prevPlaceholder) => prevPlaceholder.slice(0, currentIndex));
-        currentIndex--;
+        typingTimer = setInterval(() => {
+          setPlaceholder((prevPlaceholder) =>
+            prevPlaceholder.slice(0, currentIndex)
+          );
+          currentIndex--;
+
+          if (currentIndex === -1) {
+            clearInterval(typingTimer);
+            setTimeout(typeText, pauseDelay);
+          }
+        }, erasingDelay);
 
         if (currentIndex === -1) {
           clearInterval(typingTimer);
           setTimeout(typeText, pauseDelay);
         }
-      }, erasingDelay);
+      };
 
-      if (currentIndex === -1) {
+      typeText();
+
+      return () => {
         clearInterval(typingTimer);
-        setTimeout(typeText, pauseDelay);
-      }
-      
-    };
-    
-    typeText();
+      };
+    }
+  }, [userInteracted]);
 
-    return () => {
-      clearInterval(typingTimer);
-    };
-  }}, [userInteracted]);
   return (
     <div className="chatbox">
       <div className={`chatbox__support ${isOpen ? "chatbox--active" : ""}`}>
@@ -165,20 +185,18 @@ function Chatbox({ userName, operatorName }) {
           <img
             src="https://royalmewsdentalpractice.co.uk/wp-content/uploads/2019/09/royal-mews-logo-300x113.png"
             style={{
-                verticalAlign: "middle",
-                height: "50px",
-                width: "150px",
-                marginRight: "5px",
-              }}
+              verticalAlign: "middle",
+              height: "50px",
+              width: "150px",
+              marginRight: "5px",
+            }}
             alt=""
           />
           <span
             className="chatbox__title"
             style={{ color: "white", font: "4px" }}
           >
-            <b>
-            
-            </b>
+            <b></b>
           </span>
           <button className="chatbox__close" onClick={toggleChatbox}>
             <RiCloseFill size={20} fill="#FFF" />
@@ -194,49 +212,63 @@ function Chatbox({ userName, operatorName }) {
             </div>
           )}
           {messages
-          .slice()
-          .reverse()
-          .map((msg, index) => {
-            if (Array.isArray(msg['message'])) {
-              return (
-                <React.Fragment key={index}>
-                  {availableDates.length > 0 && (
-                
-                    <MyDatePicker availableDates={availableDates} />
-                 
-              
-                  )}
-                  <ChatboxMessage 
-                key={index} 
-                msg={{ role: 'operator', name: operatorName, message: 'Please choose a date and time that works you.' }}
-                sessionKey={sessionKey} />
-                
-                </React.Fragment>
-              );
-            } else if (msg['message'].includes('checkout')) {
-              return (
-                <React.Fragment key={index}>
-                  <CheckoutButton sessionKey={sessionKey} />
-                  <ChatboxMessage key={index} msg={msg} sessionKey={sessionKey} />
-                </React.Fragment>
-              );
-            } else {
-              return (
-                <ChatboxMessage key={index} msg={msg} sessionKey={sessionKey} />
-              );
-            }
-          })}
-
-  
+            .slice()
+            .reverse()
+            .map((msg, index) => {
+            //console.log(msg['message'])
+              if (Array.isArray(msg["message"])) {
+              //console.log(msg['message']);
+                return (
+                  <React.Fragment key={index}>
+                    {availableDates.length > 0 && (
+                      <MyDatePicker
+                        availableDates={availableDates}
+                        setDateInput={setDateInput}
+                      />
+                    )}
+                    <ChatboxMessage
+                      key={index}
+                      msg={{
+                        role: "operator",
+                        name: operatorName,
+                        message:
+                          "Please choose a date and time that works for you and press the send arrow below.",
+                      }}
+                      sessionKey={sessionKey}
+                    />
+                  </React.Fragment>
+                );
+              } else if (msg["message"].includes("checkout")) {
+                return (
+                  <React.Fragment key={index}>
+                    <CheckoutButton sessionKey={sessionKey} />
+                    <ChatboxMessage
+                      key={index}
+                      msg={msg}
+                      sessionKey={sessionKey}
+                    />
+                  </React.Fragment>
+                );
+              } else {
+                return (
+                  <ChatboxMessage
+                    key={index}
+                    msg={msg}
+                    sessionKey={sessionKey}
+                  />
+                );
+              }
+            })}
         </div>
         <div className="chatbox__footer">
           <div className="chatbox__send">
             <input
-             type="text"
-             value={text}
-             onChange={(e) => setText(e.target.value)}
-             onKeyDown={handleKeyDown}
-             placeholder={placeholder}
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              disabled={availableDates.length > 0}
             />
 
             <button className="send__button" onClick={handleSend}>
@@ -244,7 +276,7 @@ function Chatbox({ userName, operatorName }) {
             </button>
           </div>
           <div className="chatbox__powered">
-            Powered By EaziBots{" "}
+            <b>Powered By EaziBots</b>{" "}
             <img
               src="https://img.icons8.com/?size=512&id=63766&format=png"
               style={{
@@ -269,7 +301,6 @@ function Chatbox({ userName, operatorName }) {
 
 export default Chatbox;
 
-
 /*
         {messages
             .slice()
@@ -290,4 +321,3 @@ export default Chatbox;
             })}
 
 */
-
