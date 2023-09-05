@@ -1,0 +1,30 @@
+.react-Slidy li {
+  text-align: center;
+}
+
+.react-Slidy li img {
+  width: 200px;
+}
+
+.react-Slidy li p {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.react-Slidy .item__wrapper {
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+
+.react-Slidy .item__wrapper.selected {
+  border: 2px solid #6ea4f5;
+  padding: 4px 6px;
+}
+
+@media screen and (max-width: 850px) {
+  .react-Slidy-arrow {
+    display: flex !important;
+  }
+}

@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { setHours } from "date-fns";
 import "./datepicker.css";
 
-function MyDatePicker({ availableDates, setDateInput }) {
+function MyDatePicker({ availableDates, setDateTime }) {
   const [fullDate, setFullDate] = useState(null);
   // e.g 2023-07-01
   const [justDate, setJustDate] = useState("");
@@ -16,17 +16,31 @@ function MyDatePicker({ availableDates, setDateInput }) {
     day = day.split("/").reverse().join("-");
 
     setFullDate(value);
+    //console.log(fullDate)
     setJustDate(day);
     setSelectedTime(null);
   };
 
   const handleTimeChange = (value) => {
+    // Modify the time on `fullDate`'s  value.
+    const selectedTimeAndDay = new Date(fullDate)
+
     let hour = value.getHours();
-    // Modify the time on `fullDate`'s  value. It is 12:00am by default
-    const selectedTimeAndDay = setHours(new Date(fullDate), hour);
+    let minutes = value.getMinutes();
+    selectedTimeAndDay.setHours(hour);
+    selectedTimeAndDay.setMinutes(minutes);
+    console.log(value, selectedTimeAndDay)
+    
+    //minutes = Math.round(minutes/10) * 10;
+    
+    
+  
+
+    console.log(selectedTimeAndDay)
+    //setHours(new Date(fullDate), hour);
 
     setSelectedTime(selectedTimeAndDay);
-    setDateInput(selectedTimeAndDay);
+    setDateTime(selectedTimeAndDay);
   };
 
   const datesToInclude = () => {
@@ -55,6 +69,7 @@ function MyDatePicker({ availableDates, setDateInput }) {
   };
 
   const timesToInclude = availableTimes();
+  //console.log(timesToInclude)
 
   return (
     <div className="datepicker">
@@ -74,7 +89,7 @@ function MyDatePicker({ availableDates, setDateInput }) {
           placeholderText="Pick a time"
           popperPlacement="top-start"
           showTimeSelect
-          timeIntervals={60}
+          timeIntervals={30}
           timeCaption="Time"
           showTimeSelectOnly
           dateFormat="h:mm aa"

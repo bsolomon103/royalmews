@@ -1,0 +1,28 @@
+.custom__btn {
+  padding: 12px;
+  font-size: 12px;
+  width: 75px;
+  height: 40px;
+  border: none;
+  border-radius: 20px;
+  background: #6ea4f5;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  align-self: center;
+}
+
+.custom__btn:hover {
+  background: #2b7af0;
+}
+.custom__btn:focus-within {
+  background: #108a00;
+}
+
+.btn__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}

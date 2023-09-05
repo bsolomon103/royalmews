@@ -14,6 +14,11 @@
   margin: 5px 0;
 }
 
+.react-datepicker__input-container input {
+  padding: 8px;
+  border-radius: 6px;
+}
+
 .react-datepicker__time-container
   .react-datepicker__time
   .react-datepicker__time-box
