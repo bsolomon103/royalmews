@@ -9,6 +9,7 @@ import MyDatePicker from "../DatePicker";
 import ImageCarousel from "../ImageCarousel";
 import Button, { StackHorizontal } from "../Button";
 import { format } from "date-fns";
+import AnimatedPlaceholder from "./AnimatedPlaceholder";
 
 //import ImageUploadForm from '../ImageUpload';
 //import Button from '@material-ui/core/Button';
@@ -29,10 +30,6 @@ function Chatbox({ userName, operatorName }) {
   });
   const [loading, setLoading] = useState(false);
   const [sessionKey, setSessionKey] = useState("");
-  const [prevPlaceholder, setPlaceholder] = useState(
-    "Hi I'm Aurora, an AI powered assistant."
-  );
-  const [userInteracted, setUserInteracted] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
 
   const toggleChatbox = () => {
@@ -59,7 +56,6 @@ function Chatbox({ userName, operatorName }) {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSendBtn();
-      setUserInteracted(true);
     }
   };
 
@@ -206,8 +202,7 @@ function Chatbox({ userName, operatorName }) {
             value: "",
           };
         });
-      }
-      else {
+      } else {
         setCurrentInputMode(() => {
           return {
             type: "manualInput",
@@ -232,63 +227,8 @@ function Chatbox({ userName, operatorName }) {
     ) {
       handleSendBtn();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentInputMode.value, currentInputMode.type]);
-
-  useEffect(() => {
-    if (!userInteracted) {
-      let typingTimer;
-      const placeholderText = "Hi. I'm Aurora, an AI powered assistant.";
-      const typingDelay = 100; // Delay between each character
-      const erasingDelay = 50; // Delay between each character while erasing
-      const pauseDelay = 5000; // Delay before starting erasing
-
-      const typeText = () => {
-        let currentIndex = -1;
-        setPlaceholder("");
-
-        typingTimer = setInterval(() => {
-          setPlaceholder(
-            (prevPlaceholder) => prevPlaceholder + placeholderText[currentIndex]
-          );
-          currentIndex++;
-
-          if (currentIndex === placeholderText.length - 1) {
-            clearInterval(typingTimer);
-            setTimeout(eraseText, pauseDelay);
-          }
-        }, typingDelay);
-        //console.log(placeholder, placeholderText, currentIndex)
-      };
-
-      const eraseText = () => {
-        let currentIndex = placeholderText.length - 1;
-
-        typingTimer = setInterval(() => {
-          setPlaceholder((prevPlaceholder) =>
-            prevPlaceholder.slice(0, currentIndex)
-          );
-          currentIndex--;
-
-          if (currentIndex === placeholderText.length - 1) {
-            clearInterval(typingTimer);
-            setTimeout(typeText, pauseDelay);
-          }
-        }, erasingDelay);
-
-        if (currentIndex === placeholderText.length - 1) {
-          clearInterval(typingTimer);
-          setTimeout(typeText, pauseDelay);
-        }
-      };
-
-      typeText();
-
-      return () => {
-        clearInterval(typingTimer);
-      };
-    }
-  }, [userInteracted]);
 
   return (
     <div className="chatbox">
@@ -422,8 +362,7 @@ function Chatbox({ userName, operatorName }) {
                     />
                   </React.Fragment>
                 );
-              }
-              else if (
+              } else if (
                 msg["role"] === "operator" &&
                 msg["message"].includes("START button below")
               ) {
@@ -443,7 +382,7 @@ function Chatbox({ userName, operatorName }) {
                       sessionKey={sessionKey}
                     />
                   </React.Fragment>
-                ); 
+                );
               } else if (
                 msg["role"] === "operator" &&
                 msg["message"].includes("Click the PAY")
@@ -464,7 +403,7 @@ function Chatbox({ userName, operatorName }) {
                       sessionKey={sessionKey}
                     />
                   </React.Fragment>
-                ); 
+                );
               } else if (
                 msg["role"] === "operator" &&
                 msg["message"].includes("I/C")
@@ -491,9 +430,8 @@ function Chatbox({ userName, operatorName }) {
                       sessionKey={sessionKey}
                     />
                   </React.Fragment>
-                ); 
-              } 
-              else if (msg["message"].includes("checkout")) {
+                );
+              } else if (msg["message"].includes("checkout")) {
                 return (
                   <React.Fragment key={index}>
                     <CheckoutButton sessionKey={sessionKey} />
@@ -518,14 +456,17 @@ function Chatbox({ userName, operatorName }) {
 
         <div className="chatbox__footer">
           <div className="chatbox__send">
-            <input
-              type="text"
-              value={manualTextInput}
-              onChange={(e) => setManualTextInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={prevPlaceholder}
-              disabled={currentInputMode.type !== "manualInput"}
-            />
+            <div className="typed_wrapper">
+              <AnimatedPlaceholder placeholderString="Hi I'm Aurora, an AI powered assistant.">
+                <input
+                  type="text"
+                  value={manualTextInput}
+                  onChange={(e) => setManualTextInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={currentInputMode.type !== "manualInput"}
+                />
+              </AnimatedPlaceholder>
+            </div>
 
             <button className="send__button" onClick={handleSendBtn}>
               <IoMdSend size={30} color="#FFF" />

@@ -139,8 +139,17 @@
     gap: 10px;
 }
 
-.chatbox__send input {
+.typed_wrapper {
     flex: 1;
+}
+
+.typed_wrapper > span {
+    width: 100%;
+    display: inline-block;
+}
+
+.chatbox__send input {
+    width: 100%;
     border: none;
     outline: none;
     padding: 10px 10px;
