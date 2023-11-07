@@ -10,6 +10,7 @@ import ImageCarousel from "../ImageCarousel";
 import Button, { StackHorizontal } from "../Button";
 import { format } from "date-fns";
 import AnimatedPlaceholder from "./AnimatedPlaceholder";
+import ButtonGroup from '../ButtonGrid';
 
 //import ImageUploadForm from '../ImageUpload';
 //import Button from '@material-ui/core/Button';
@@ -139,20 +140,25 @@ function Chatbox({ userName, operatorName }) {
         credentials: "include",
       });
       const result = await response.json();
-      //console.log(result)
+      const text = result['response']['response']['text']
+      const probe = result['response']['response']['probe']
+      const buttons = result['response']['response']['buttons']
+    
+      
 
       setLoading(false);
 
       const msg2 = {
         role: "operator",
         name: operatorName,
-        message: result["response"],
+        message: result['response']['response'],
+        //probe: result['response']['probe']
       };
       setSessionKey(result["session_key"]);
 
       if (Array.isArray(result["response"])) {
         const startDates = result["response"].map((dateObj) => dateObj.start);
-        //console.log(startDates)
+    
         setAvailableDates(startDates); // Update availableDates state with the array of start dates
         setCurrentInputMode(() => {
           return {
@@ -160,49 +166,14 @@ function Chatbox({ userName, operatorName }) {
             value: "",
           };
         });
-      } else if (result["response"].includes("Which teeth")) {
-        setCurrentInputMode(() => {
-          return {
-            type: "image",
-            value: "",
-          };
-        });
-      } else if (result["response"].includes("Y/N")) {
+      } else if (probe == 'True') {
         setCurrentInputMode(() => {
           return {
             type: "button",
             value: "",
           };
         });
-      } else if (result["response"].includes("START button below")) {
-        setCurrentInputMode(() => {
-          return {
-            type: "button",
-            value: "",
-          };
-        });
-      } else if (result["response"].includes("new or existing")) {
-        setCurrentInputMode(() => {
-          return {
-            type: "button",
-            value: "",
-          };
-        });
-      } else if (result["response"].includes("I/C")) {
-        setCurrentInputMode(() => {
-          return {
-            type: "button",
-            value: "",
-          };
-        });
-      } else if (result["response"].includes("Click the PAY")) {
-        setCurrentInputMode(() => {
-          return {
-            type: "button",
-            value: "",
-          };
-        });
-      } else {
+      }else {
         setCurrentInputMode(() => {
           return {
             type: "manualInput",
@@ -235,7 +206,7 @@ function Chatbox({ userName, operatorName }) {
       <div className={`chatbox__support ${isOpen ? "chatbox--active" : ""}`}>
         <div className="chatbox__header">
           <img
-            src="https://royalmewsdentalpractice.co.uk/wp-content/uploads/2019/09/royal-mews-logo-300x113.png"
+            src="https://www.southend.gov.uk/site/dist/images/site-logo.svg"
             style={{
               verticalAlign: "middle",
               height: "50px",
@@ -267,6 +238,130 @@ function Chatbox({ userName, operatorName }) {
             .slice()
             .reverse()
             .map((msg, index) => {
+            if (
+                msg["role"] === "operator" && msg.message.probe =='True'
+                
+              ) {
+                
+                const buttons = msg.message.buttons
+                console.log(buttons)
+                return (
+                  <React.Fragment key={index}>
+                  {currentInputMode.type === "button" && index === 0 ? (
+                  <StackHorizontal>
+                  <ButtonGroup buttons={buttons} onClick={updateCurrentInputValue}
+                  />
+                  </StackHorizontal>
+                  ) : null}
+                    <ChatboxMessage
+                      key={index}
+                      msg={msg}
+                      sessionKey={sessionKey}
+                    />
+                  </React.Fragment>
+                );
+              } else  {
+                return (
+                  <ChatboxMessage
+                    key={index}
+                    msg={msg}
+                    sessionKey={sessionKey}
+                  />
+                );
+              }
+            })}
+        </div>
+
+        <div className="chatbox__footer">
+          <div className="chatbox__send">
+            <div className="typed_wrapper">
+              <AnimatedPlaceholder placeholderString="Hi I'm Aurora, an AI powered assistant.">
+                <input
+                  type="text"
+                  value={manualTextInput}
+                  onChange={(e) => setManualTextInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={currentInputMode.type !== "manualInput"}
+                />
+              </AnimatedPlaceholder>
+            </div>
+
+            <button className="send__button" onClick={handleSendBtn}>
+              <IoMdSend size={30} color="#FFF" />
+            </button>
+          </div>
+          <div className="chatbox__powered">
+            <b>Powered By EaziBots</b>{" "}
+            <img
+              src="https://img.icons8.com/?size=512&id=63766&format=png"
+              style={{
+                verticalAlign: "middle",
+                height: "30px",
+                width: "30px",
+                marginRight: "5px",
+              }}
+              alt="globe"
+            ></img>
+          </div>
+        </div>
+      </div>
+      <div className="chatbox__toggle">
+        <button className="chatbox__button" onClick={toggleChatbox}>
+          <BsChatRightTextFill size={40} color="#FFF" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default Chatbox;
+
+/*
+
+/* else if (result["response"].includes("START button below")) {
+        setCurrentInputMode(() => {
+          return {
+            type: "button",
+            value: "",
+          };
+        });
+      } else if (result["response"]["response"].includes("new or existing")) {
+        setCurrentInputMode(() => {
+          return {
+            type: "button",
+            value: "",
+          };
+        });
+      }/* else if (result["response"].includes("I/C")) {
+        setCurrentInputMode(() => {
+          return {
+            type: "button",
+            value: "",
+          };
+        });
+      } else if (result["response"].includes("Click the PAY")) {
+        setCurrentInputMode(() => {
+          return {
+            type: "button",
+            value: "",
+          };
+        });
+      } */
+/* else if (result["response"].includes("Which teeth")) {
+        setCurrentInputMode(() => {
+          return {
+            type: "image",
+            value: "",
+          };
+        });
+      }*/
+      
+
+
+
+ //console.log(msg.probe)
+            //console.log(msg['response']['response'])
+            /*
               if (Array.isArray(msg["message"])) {
                 return (
                   <React.Fragment key={index}>
@@ -309,37 +404,12 @@ function Chatbox({ userName, operatorName }) {
                       sessionKey={sessionKey}
                     />
                   </React.Fragment>
-                );
-              } else if (
-                msg["role"] === "operator" &&
-                msg["message"].includes("Y/N")
-              ) {
-                return (
-                  <React.Fragment key={index}>
-                    {currentInputMode.type === "button" && index === 0 ? (
-                      <StackHorizontal>
-                        <Button
-                          label={"Yes"}
-                          onClick={() => updateCurrentInputValue("Yes")}
-                          style={{ padding: "5px 10px", fontSize: "3px" }}
-                        />
-                        <Button
-                          label={"No"}
-                          onClick={() => updateCurrentInputValue("No")}
-                          style={{ padding: "5px 10px", fontSize: "3px" }}
-                        />
-                      </StackHorizontal>
-                    ) : null}
-                    <ChatboxMessage
-                      key={index}
-                      msg={msg}
-                      sessionKey={sessionKey}
-                    />
-                  </React.Fragment>
-                );
-              } else if (
+                )
+              }
+/* else if (
                 msg["role"] === "operator" &&
                 msg["message"].includes("new or existing")
+            
               ) {
                 return (
                   <React.Fragment key={index}>
@@ -442,58 +512,21 @@ function Chatbox({ userName, operatorName }) {
                     />
                   </React.Fragment>
                 );
-              } else {
-                return (
-                  <ChatboxMessage
-                    key={index}
-                    msg={msg}
-                    sessionKey={sessionKey}
-                  />
-                );
               }
-            })}
-        </div>
 
-        <div className="chatbox__footer">
-          <div className="chatbox__send">
-            <div className="typed_wrapper">
-              <AnimatedPlaceholder placeholderString="Hi I'm Aurora, an AI powered assistant.">
-                <input
-                  type="text"
-                  value={manualTextInput}
-                  onChange={(e) => setManualTextInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={currentInputMode.type !== "manualInput"}
-                />
-              </AnimatedPlaceholder>
-            </div>
 
-            <button className="send__button" onClick={handleSendBtn}>
-              <IoMdSend size={30} color="#FFF" />
-            </button>
-          </div>
-          <div className="chatbox__powered">
-            <b>Powered By EaziBots</b>{" "}
-            <img
-              src="https://img.icons8.com/?size=512&id=63766&format=png"
-              style={{
-                verticalAlign: "middle",
-                height: "30px",
-                width: "30px",
-                marginRight: "5px",
-              }}
-              alt="globe"
-            ></img>
-          </div>
-        </div>
-      </div>
-      <div className="chatbox__toggle">
-        <button className="chatbox__button" onClick={toggleChatbox}>
-          <BsChatRightTextFill size={40} color="#FFF" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-export default Chatbox;
+{currentInputMode.type === "button" && index === 0 ? (
+                      <StackHorizontal>
+                        <Button
+                          label={"Yes"}
+                          onClick={() => updateCurrentInputValue("Yes")}
+                          style={{ padding: "5px 10px", fontSize: "3px" }}
+                        />
+                        <Button
+                          label={"No"}
+                          onClick={() => updateCurrentInputValue("No")}
+                          style={{ padding: "5px 10px", fontSize: "3px" }}
+                        />
+                      </StackHorizontal>
+                    ) : null}
+*/

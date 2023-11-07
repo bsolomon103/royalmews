@@ -1,12 +1,12 @@
 .custom__btn {
-  padding: 12px;
-  font-size: 12px;
+  padding: 6px;
+  font-size: 8px;
   width: 75px;
   height: 40px;
-  border: none;
+  border: 2px solid #003366;
   border-radius: 20px;
-  background: #6ea4f5;
-  color: #fff;
+  background: #fff;
+  color: black;
   font-weight: 700;
   cursor: pointer;
   text-align: center;
@@ -24,5 +24,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.85rem;
+  gap: 1.85rem;
 }
+
+
+.button-group {
+  display: flex;
+}
+
+.button-group .custom__btn:not(:last-child) {
+  margin-right: 10px; /* Adjust this value to control the spacing */
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Create 3 columns */
+  grid-gap: 10px; /* Adjust the gap between buttons */
+}
+
+/* Other button styles and adjustments as needed */

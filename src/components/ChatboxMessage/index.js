@@ -3,6 +3,7 @@ import NameBadge from "../NameBadge";
 import "./chatboxMessage.css";
 
 export default function ChatboxMessage({ msg, sessionKey }) {
+  console.log(msg)
   const isOperator = msg.role === "operator";
 
   return (
@@ -18,7 +19,7 @@ export default function ChatboxMessage({ msg, sessionKey }) {
         }`}
       >
         {isOperator ? (
-          <div dangerouslySetInnerHTML={{ __html: msg.message }} />
+          <div dangerouslySetInnerHTML={{ __html: msg.message.text }} />
         ) : (
           <Linkify
             componentDecorator={(decoratedHref, decoratedText, key) => (
