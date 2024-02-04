@@ -2,8 +2,9 @@ import "./button.css";
 
 const Button = ({ label, onClick, image }) => {
   return (
-    <button className="custom__btn" onClick={onClick}>
-    {label}
+    <button title="Test" className="custom__btn" onClick={onClick}>
+       {image && <img src={image} alt={label} className='button-image'/>}
+    <span className='button-text'>{label}</span>
     </button>
   );
 };

@@ -5,5 +5,18 @@
     border: 2px solid;
     border-radius: 10px;
     padding: 10px;
-    background-color: #6ea4f57d;
+    background-color: #6ed1f57d;
+    height:100px;
+}
+
+.button-group {
+  display: none;
+}
+
+.button-group.visible {
+  display: block;
+}
+
+.button-group.hidden {
+  display: none;
 }

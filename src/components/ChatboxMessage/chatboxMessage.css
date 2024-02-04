@@ -45,7 +45,7 @@
 .messages__item {
     background: #98891b2e;
     padding: 8px 12px;
-    max-width: 70%;
+    max-width: 90%;
 }
 
 .messages__item--operator,
@@ -69,4 +69,14 @@
     color: #003366;
     border: 2px solid #003366;
     text-align: justify;
+}
+
+.messages__item--operator:hover {
+    background-color: #6ed1f57d;
+    color:black;
+}
+
+.messages__item--visitor:hover {
+    background-color: #6ed1f57d;
+    color:black;
 }

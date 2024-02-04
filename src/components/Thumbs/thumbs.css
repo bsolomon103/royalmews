@@ -1,0 +1,68 @@
+.thumbs-icons {
+  display: flex;
+  justify-content: flex-start; /* Align icons to the right */
+  flex-direction: column;
+  align-items: flex-start; /* Center vertically */
+  margin-right: 2px; /* Adjust as needed for spacing */
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+
+/* Add hover, focus, and active styles for the thumb-buttons */
+.thumb-button {
+    cursor: pointer;
+    background-color: #fff;
+    color: #000;
+    padding: 1px 1px;
+    border: none;
+    border-radius: 4px;
+    margin-right: 10px;
+    transition: background-color 0.4s;
+    text-align: center;
+    font-size: 13px;
+
+}
+
+.thumb-button-up {
+  background-color: #fff; /* Green color for thumb up */
+  border: none; /* Dark green border for thumb up */
+  color: #000; /* White text color for thumb up */
+  padding: 1px 2px; /* Adjust padding as needed */
+  border-radius: 8px; /* Rounded corners for the button */
+  margin-right: 10px;
+  transition: background-color 0.4s ease; /* Smooth transition for background color */
+}
+.thumb-button-up:hover {
+  background-color: #84d98c;
+}
+
+.thumb-button-down {
+  background-color: #fff; /* Green color for thumb up */
+  border: none; /* Dark green border for thumb up */
+  color: #000; /* White text color for thumb up */
+  padding: 1px 2px; /* Adjust padding as needed */
+  border-radius: 8px; /* Rounded corners for the button */
+  margin-right: 10px;
+  transition: background-color 0.4s ease; /* Smooth transition for background color */
+}
+.thumb-button-down:hover {
+  background-color: #e52615ad;
+}
+
+
+
+.thumb-button:focus {
+  outline: none;
+  box-shadow: 0 0 5px #007bff;
+}
+
+.thumb-button:active {
+  background-color: #0056b3;
+}
+
+
+.my-span {
+  font-size: 8px; /* Set the desired font size */
+  margin-top: -9px;
+}
