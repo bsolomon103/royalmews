@@ -67,21 +67,25 @@ export default function ChatboxMessage({ msg, sessionKey, onClick }) {
         className={`messages__item ${
           isOperator ? "messages__item--operator" : "messages__item--visitor"
         }`}
+        style={{ maxWidth: "85%", wordWrap: "break-word" }}
+       
       >
         {isOperator ? (
           <React.Fragment>
             {/*Display streaming content as it arrives */}
+            
             {isLoading ? "Loading..." : (
               <Linkify
                 componentDecorator={(decoratedHref, decoratedText, key) => (
-                  <a
-                    target="_blank"
-                    style={{ color: "#003366" }}
-                    href={decoratedHref}
-                    key={key}
-                  >
-                    {decoratedText}
-                  </a>
+                <a
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#003366"}}
+                href={decoratedHref}
+                key={key}
+                >
+                {decoratedText}
+              </a>
                 )}
               >
                 {messageContent}
@@ -91,24 +95,36 @@ export default function ChatboxMessage({ msg, sessionKey, onClick }) {
           </React.Fragment>
           
         ) : (
+          
           <Linkify
             componentDecorator={(decoratedHref, decoratedText, key) => (
-              <a
-                target="_blank"
-                style={{ color: "#003366" }}
-                href={decoratedHref}
-                key={key}
-              >
-                {decoratedText}
-              </a>
+            <span style={{ borderRadius: '5px', overflow: 'hidden' }} key={key}>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ 
+                    color: "#003366", 
+                    textDecoration: 'none',
+                    padding: '5px', // Optional: Add padding for spacing inside the link
+                    backgroundColor: '#f0f0f0', // Optional: Add background color for the link
+                    display: 'inline-block' // Optional: Ensure the link is treated as a block element
+                  }}
+                  href={decoratedHref}
+                >
+                  {decoratedText}
+                </a>
+            </span>
+       
             )}
           >
             {messageContent}
           </Linkify>
+
       
         )}
+      
       </div>
-      {isOperator && !isLoading && <MyThumbs onClickMethod={onClick}/>}
+      {isOperator && !isLoading}
     </div>
   );
 }

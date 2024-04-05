@@ -1,0 +1,18 @@
+.recording {
+  background-color: red;
+  color: white;
+
+}
+
+.button {
+  border-radius: 50%;
+  width: 50px; /* Adjust as needed */
+  height: 50px; /* Adjust as needed */
+  padding: 0; /* Optional, adjust as needed */
+  background-color: #ccc; /* Optional, adjust as needed */
+  border: none; /* Optional, adjust as needed */
+}
+
+.button.recording {
+  /* Add additional styles for the recording state if needed */
+}

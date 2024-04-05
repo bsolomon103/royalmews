@@ -11,7 +11,6 @@ function MyThumbs({onClickMethod}) {
         <span className='my-span'><b>Like</b></span>
 
         <div className="thumb-button-down" onClick={() => onClickMethod('Dislike')}>
-        {console.log('here')}
           <FaThumbsDown />
           <span className='my-span'></span>
         </div>
@@ -23,3 +22,11 @@ function MyThumbs({onClickMethod}) {
 }
 
 export default MyThumbs;
+
+function handleButtonClick(button, onClick) {
+
+    onClick(button);// Send the response back to the server
+    console.log(button)
+  
+}
+

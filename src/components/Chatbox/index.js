@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./chatbox.css";
 import { BsChatRightTextFill } from "react-icons/bs";
 import { RiCloseFill } from "react-icons/ri";
@@ -10,14 +10,18 @@ import ChatboxMessage from "../ChatboxMessage";
 //import Button, { StackHorizontal } from "../Button";
 import { format } from "date-fns";
 import AnimatedPlaceholder from "./AnimatedPlaceholder";
-import MyThumbs from '../Thumbs';
+import excludedUrls from "../ExcludedUrls";
+import SpeechToText from "../Speech2text";
+
+//import MyThumbs from '../Thumbs';
 //import ButtonGroup from '../ButtonGrid';
 
 const URL = "https://api.eazibots.com/api/response/";
 
 function Chatbox({ userName, operatorName }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [messages, setMessages] = useState([]);
+  const [showIframe, setShowIframe] = useState(false);
   const [manualTextInput, setManualTextInput] = useState("");
   const [currentInputMode, setCurrentInputMode] = useState({
     type: "manualInput",
@@ -25,7 +29,8 @@ function Chatbox({ userName, operatorName }) {
   });
   const [loading, setLoading] = useState(false);
   const [sessionKey, setSessionKey] = useState("");
-  const [availableDates, setAvailableDates] = useState([]);
+  const messagesContainerRef = useRef(null);
+  //const [availableDates, setAvailableDates] = useState([]);
 
   const toggleChatbox = () => {
     setIsOpen(!isOpen);
@@ -65,17 +70,18 @@ function Chatbox({ userName, operatorName }) {
     return format(new Date(datetime), stringFormat);
   };
 
-  const updateCurrentInputValue = (value) => {
+ /* const updateCurrentInputValue = (value) => {
     return setCurrentInputMode((prevState) => {
       return {
         type: prevState.type,
         value: value,
       };
     });
-  };
+  };*/
 
   const handleSendBtn = () => {
     const { type, value } = currentInputMode;
+    console.log(currentInputMode)
 
     if (
       (type === "manualInput" && manualTextInput.trim() === "") ||
@@ -99,12 +105,13 @@ function Chatbox({ userName, operatorName }) {
     }
 
     setLoading(true);
+    //console.log('here')
     const msg1 = { role: "user", name: userName, message: String(newMessage) };
     setMessages((messages) => [...messages, msg1]);
 
     // resets
     setManualTextInput("");
-    setAvailableDates([]);
+    
     setCurrentInputMode(() => {
       return {
         type: "manualInput",
@@ -119,7 +126,7 @@ function Chatbox({ userName, operatorName }) {
   const submitValue = async (value) => {
     const csrftoken = getCookie("csrftoken");
     const sessiontoken = getCookie("sessionid");
-    //console.log(csrftoken, ">>>>>>", sessiontoken);
+    console.log('value', ">>>>>>", value);
 
     try {
       const response = await fetch(URL, {
@@ -135,7 +142,7 @@ function Chatbox({ userName, operatorName }) {
       });
       const result = await response.json();
       console.log(result)
-      const text = result['response']
+      //const text = result['response']
       
 
       setLoading(false);
@@ -148,7 +155,7 @@ function Chatbox({ userName, operatorName }) {
       };
       setSessionKey(result["session_key"]);
 
-      if (Array.isArray(result["response"])) {
+      /*if (Array.isArray(result["response"])) {
         const startDates = result["response"].map((dateObj) => dateObj.start);
     
         setAvailableDates(startDates); // Update availableDates state with the array of start dates
@@ -158,14 +165,14 @@ function Chatbox({ userName, operatorName }) {
             value: "",
           };
         });
-      }else {
+      }else */
         setCurrentInputMode(() => {
           return {
             type: "manualInput",
             value: "",
           };
         });
-      }
+      
 
       setMessages((messages) => [...messages, msg2]);
     } catch (err) {
@@ -185,21 +192,46 @@ function Chatbox({ userName, operatorName }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentInputMode.value, currentInputMode.type]);
+  
+  
+  
+  const extractUrl = (message) => {
+  const urlRegex = /\bhttps?:\/\/[^\s)]+/gi;
+  const matches = message.match(urlRegex);
+  if (matches && matches.length > 0) {
+    let url = matches[0];
+    // Remove trailing full stop if it exists
+    url = url.replace(/[\.,]$/, '');
+
+
+    return url;
+  }
+  return null;
+};
+  
+  useEffect(() => {
+    // Set showIframe to true after a delay
+    const timeoutId = setTimeout(() => {
+      setShowIframe(true);
+     
+    }, 0); // Adjust the delay as needed (in milliseconds)
+
+    // Clear the timeout when the component unmounts or when messages change
+    return () => clearTimeout(timeoutId);
+  }, [messages]); // Assuming 'messages' is the array of messages
+  
+
+  // Define a function to update the manualTextInput state
+  const updateManualTextInput = (text) => {
+    setManualTextInput(text);
+  };
+
 
   return (
     <div className="chatbox">
       <div className={`chatbox__support ${isOpen ? "chatbox--active" : ""}`}>
         <div className="chatbox__header">
-          <img
-            src="https://www.southend.gov.uk/site/dist/images/site-logo.svg"
-            style={{
-              verticalAlign: "middle",
-              height: "50px",
-              width: "150px",
-              marginRight: "5px",
-            }}
-            alt=""
-          />
+        
           <span
             className="chatbox__title"
             style={{ color: "white", font: "4px" }}
@@ -223,47 +255,67 @@ function Chatbox({ userName, operatorName }) {
             .slice()
             .reverse()
             .map((msg, index) => {
-            console.log(msg)
-            if (
-                msg["role"] === "operator"
-                
-              ) {
-                
+            //console.log(msg)
+            if (msg["role"] === "operator"){
+               const  url = extractUrl(msg.message.toString())
+               if (url && !excludedUrls.some(excludedUrl => url.includes(excludedUrl))) {
+               setTimeout(() => {
+              }, 1000 * index);
+              return (
+               <div key={index} className="message-container">
+                        <ChatboxMessage
+                            msg={msg}
+                            sessionKey={sessionKey}
+                            onClick={submitValue}
+                        />
+                         {showIframe && (
+                    <iframe
+                      src={url}
+                      title="Embedded Website"
+                      width="100%"
+                      height="400px"
+                    />
+                  )}
+                    </div>
+            
+              );
+            } else {
+            
                 return (
-                  
+                
                     <ChatboxMessage
                       key={index}
                       msg={msg}
                       sessionKey={sessionKey}
-                      onClick={updateCurrentInputValue}
+                      onClick={submitValue}
                     />
-                   
+                 
                 );
-              } else  {
+              }} else  {
                 return (
                   <ChatboxMessage
                     key={index}
                     msg={msg}
                     sessionKey={sessionKey}
-                    onClick={updateCurrentInputValue}
+                    onClick={submitValue}
                   />
                 );
               }
             })}
+       
         </div>
 
         <div className="chatbox__footer">
           <div className="chatbox__send">
             <div className="typed_wrapper">
-              <AnimatedPlaceholder placeholderString="Hi I'm Aurora, an AI powered assistant.">
+              <AnimatedPlaceholder placeholderString="Hi I'm Aurora, how are you today?">
                 <input
                   type="text"
                   value={manualTextInput}
                   onChange={(e) => setManualTextInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   disabled={currentInputMode.type !== "manualInput"}
-                  //style={{width: '100px'}}
-                  rows={Math.max(manualTextInput.split('\n').length, 1)} 
+                  //style={{ resize: 'none', overflowY: 'hidden', minHeight: '50px' }}
                 />
               </AnimatedPlaceholder>
             </div>
@@ -271,8 +323,11 @@ function Chatbox({ userName, operatorName }) {
             <button className="send__button" onClick={handleSendBtn}>
               <IoMdSend size={30} color="#FFF" />
             </button>
+            
+            
           </div>
           <div className="chatbox__powered">
+           <a href="https://eazibots.com/" target="_blank" rel="noreferrer" style={{ textDecoration: "none", color: "inherit" }}>
             <b>Powered By EaziBots</b>{" "}
             <img
               src="https://img.icons8.com/?size=512&id=63766&format=png"
@@ -284,6 +339,7 @@ function Chatbox({ userName, operatorName }) {
               }}
               alt="globe"
             ></img>
+            </a>
           </div>
         </div>
       </div>
@@ -300,6 +356,21 @@ export default Chatbox;
 
 
 /*import { fetchEventSource } from "@microsoft/fetch-event-source";
+
+  <img
+            src="https://www.southend.gov.uk/site/dist/images/site-logo.svg"
+            style={{
+              verticalAlign: "middle",
+              height: "50px",
+              width: "150px",
+              marginRight: "5px",
+            }}
+            alt=""
+          />
+
+            <SpeechToText sendToServer={handleSendBtn} updateManualTextInput={updateManualTextInput} />
+
+
 import React, { useState, useEffect } from "react";
 import "./chatbox.css";
 import { BsChatRightTextFill } from "react-icons/bs";
